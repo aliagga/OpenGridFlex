@@ -1,0 +1,10 @@
+dataset: simbench
+grids:
+  - 1-LV-rural1--0-sw
+  - 1-LV-urban6--0-sw
+  - 1-MV-rural--0-sw
+resolution_minutes: 60
+train_fraction: 0.60
+val_fraction: 0.20
+test_fraction: 0.20
+seed: 42

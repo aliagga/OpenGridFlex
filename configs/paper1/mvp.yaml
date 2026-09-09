@@ -1,0 +1,6 @@
+experiment: gridshiftbench_mvp
+data_config: configs/data/simbench_mvp.yaml
+models: [seasonal_naive, lightgbm_quantile, patchtst, graph_temporal, shiftguard_gt]
+shifts: [season, der_penetration, topology, sensor_dropout]
+seeds: [11, 22, 33]
+metrics: [mae, rmse, pinball, coverage, interval_width, runtime]

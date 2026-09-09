@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opengridflex"
+version = "0.2.0.dev0"
+description = "Trustworthy distribution-shift and uncertainty benchmark for active distribution-grid AI"
+readme = "README.md"
+requires-python = ">=3.11,<3.14"
+license = {text = "MIT"}
+authors = [{name = "OpenGridFlex contributors"}]
+dependencies = [
+  "numpy>=1.26,<3",
+  "pandas>=2.2,<3",
+  "scikit-learn>=1.5,<2",
+  "lightgbm>=4.5,<5",
+  "torch>=2.4,<3",
+  "pyyaml>=6.0,<7",
+  "matplotlib>=3.9,<4",
+]
+
+[project.optional-dependencies]
+grid = [
+  "pandapower>=3.2,<4",
+  "simbench==1.6.2",
+]
+graph = ["torch-geometric>=2.5,<3"]
+dev = [
+  "pytest>=8,<10",
+  "pytest-cov>=5,<8",
+  "ruff>=0.8,<1",
+]
+all = [
+  "pandapower>=3.2,<4",
+  "simbench==1.6.2",
+  "torch-geometric>=2.5,<3",
+]
+
+[project.scripts]
+opengridflex = "opengridflex.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+  "integration: tests requiring optional grid/simulator dependencies",
+]
+
+[tool.ruff]
+line-length = 110
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]

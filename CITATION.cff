@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+title: OpenGridFlex
+message: "If you use OpenGridFlex, please cite the associated GridShiftBench and SafeFlex-DFL papers."
+type: software
+version: 0.1.0
+date-released: 2026-09-08
+license: BSD-3-Clause

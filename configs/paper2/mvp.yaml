@@ -1,0 +1,9 @@
+experiment: safeflex_dfl_mvp
+predictor: shiftguard_gt
+decision_horizon: 24
+grid_model_train: lindistflow
+grid_model_validate: ac_powerflow
+resources: [pv, bess, ev, flexible_load]
+methods: [perfect_foresight, predict_then_optimize, dfl, safeflex_dfl]
+shifts: [high_pv, behavior, price, topology]
+metrics: [cost, regret, voltage_violations, overload, curtailment, coverage, repair_magnitude]
