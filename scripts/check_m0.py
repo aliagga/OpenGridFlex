@@ -6,6 +6,7 @@ Exit codes:
   1: a required check failed
   2: a required tool is unavailable (gate remains blocked)
 """
+
 from __future__ import annotations
 
 import argparse
@@ -13,7 +14,6 @@ import shutil
 import subprocess
 import sys
 from pathlib import Path
-
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -44,7 +44,15 @@ def main() -> int:
         ("Python compile", [sys.executable, "-m", "compileall", "-q", "src"]),
         (
             "Config validation",
-            [sys.executable, "-m", "opengridflex.cli", "validate-config", "configs/paper1/mvp.yaml", "--repo-root", "."],
+            [
+                sys.executable,
+                "-m",
+                "opengridflex.cli",
+                "validate-config",
+                "configs/paper1/mvp.yaml",
+                "--repo-root",
+                ".",
+            ],
         ),
         ("Unit tests", [sys.executable, "-m", "pytest", "-q"]),
         (
@@ -72,7 +80,10 @@ def main() -> int:
     ruff = shutil.which("ruff")
     if ruff is None:
         print("\n=== Static lint ===")
-        print("BLOCKED: ruff is not installed. M0 must remain non-green until lint runs in CI or a dev environment.")
+        print(
+            "BLOCKED: ruff is not installed. M0 must remain non-green "
+            "until lint runs in CI or a dev environment."
+        )
         return 0 if args.allow_missing_lint else 2
     if not run("Static lint", [ruff, "check", "src", "tests"], env=env):
         return 1

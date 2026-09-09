@@ -22,8 +22,9 @@ dependencies = [
 
 [project.optional-dependencies]
 grid = [
-  "pandapower>=3.2,<4",
+  "pandapower==3.5.4",
   "simbench==1.6.2",
+  "numba==0.67.0",
 ]
 graph = ["torch-geometric>=2.5,<3"]
 dev = [
@@ -32,8 +33,9 @@ dev = [
   "ruff>=0.8,<1",
 ]
 all = [
-  "pandapower>=3.2,<4",
+  "pandapower==3.5.4",
   "simbench==1.6.2",
+  "numba==0.67.0",
   "torch-geometric>=2.5,<3",
 ]
 
