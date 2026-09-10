@@ -1,0 +1,51 @@
+{
+  "contract_id": "gridshiftbench-v1",
+  "grid_code": "1-MV-urban--1-no_sw",
+  "primary_task": {
+    "history_channels": [
+      "net_demand_p_mw",
+      "net_demand_q_mvar"
+    ],
+    "history_steps": 96,
+    "horizon_steps": 16,
+    "lead_steps": 1,
+    "resolution_minutes": 15,
+    "target_channels": [
+      "net_demand_p_mw",
+      "net_demand_q_mvar"
+    ],
+    "task_id": "gsb_bus_pq_4h_v1"
+  },
+  "quantiles": [
+    0.05,
+    0.1,
+    0.25,
+    0.5,
+    0.75,
+    0.9,
+    0.95
+  ],
+  "schema_version": 1,
+  "secondary_task": {
+    "history_channels": [
+      "net_demand_p_mw",
+      "net_demand_q_mvar"
+    ],
+    "history_steps": 672,
+    "horizon_steps": 96,
+    "lead_steps": 1,
+    "resolution_minutes": 15,
+    "target_channels": [
+      "net_demand_p_mw",
+      "net_demand_q_mvar"
+    ],
+    "task_id": "gsb_bus_pq_24h_v1"
+  },
+  "split": {
+    "dataset_end_local": "2017-01-01 00:00:00",
+    "test_start_local": "2016-11-07 00:00:00",
+    "timezone": "Europe/Berlin",
+    "train_start_local": "2016-01-01 00:00:00",
+    "validation_start_local": "2016-09-13 00:00:00"
+  }
+}
