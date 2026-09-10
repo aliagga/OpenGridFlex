@@ -100,9 +100,7 @@ def test_standardizer_is_fitted_only_on_train_rows() -> None:
         atol=1e-12,
     )
 
-    mutated_values = {
-        name: value.copy() for name, value in series.values.items()
-    }
+    mutated_values = {name: value.copy() for name, value in series.values.items()}
     mutated_values["load_p_mw"][split.train_end :] += 1_000_000.0
 
     mutated = CanonicalGridSeries(

@@ -12,7 +12,6 @@ from opengridflex.data.leakproof_dataset import (
     make_chronological_split,
 )
 
-
 GRID_CODE = "1-MV-urban--1-no_sw"
 
 

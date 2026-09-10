@@ -14,7 +14,6 @@ from opengridflex.data.leakproof_dataset import (
     make_chronological_split,
 )
 
-
 GRID_CODE = "1-MV-urban--1-no_sw"
 
 pytestmark = pytest.mark.integration
@@ -109,9 +108,7 @@ def test_real_standardizer_uses_train_rows_only(series) -> None:
         ),
     )
 
-    direct = series.channel("net_demand_p_mw")[
-        : split.train_end
-    ].astype(np.float64)
+    direct = series.channel("net_demand_p_mw")[: split.train_end].astype(np.float64)
     assert np.allclose(
         scaler.means["net_demand_p_mw"],
         direct.mean(axis=0),

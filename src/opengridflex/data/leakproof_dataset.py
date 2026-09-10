@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 import hashlib
+from collections.abc import Iterable
 from dataclasses import asdict, dataclass
-from typing import Any, Iterable
+from typing import Any
 
 import numpy as np
 import pandas as pd
@@ -16,7 +17,6 @@ from opengridflex.grids.simbench_adapter import (
     _parse_profile_time,
     load_validated_simbench_grid,
 )
-
 
 CANONICAL_CHANNELS = (
     "load_p_mw",
@@ -52,8 +52,7 @@ class CanonicalGridSeries:
             return self.values[name]
         except KeyError as exc:
             raise GridIntegrityError(
-                f"Unknown canonical channel {name!r}. "
-                f"Available: {sorted(self.values)}"
+                f"Unknown canonical channel {name!r}. Available: {sorted(self.values)}"
             ) from exc
 
 
@@ -167,16 +166,14 @@ class TrainOnlyStandardizer:
         channels: Iterable[str],
         *,
         eps: float = 1e-12,
-    ) -> "TrainOnlyStandardizer":
+    ) -> TrainOnlyStandardizer:
         chosen = tuple(channels)
         if not chosen:
             raise GridIntegrityError("At least one channel is required.")
 
         start, end = split.bounds("train")
         if start != 0:
-            raise GridIntegrityError(
-                "The current M2 contract requires training to begin at row 0."
-            )
+            raise GridIntegrityError("The current M2 contract requires training to begin at row 0.")
         if end <= start:
             raise GridIntegrityError("Training split is empty.")
 
@@ -196,9 +193,7 @@ class TrainOnlyStandardizer:
             safe_std[is_constant] = 1.0
 
             if not np.isfinite(mean).all() or not np.isfinite(safe_std).all():
-                raise GridIntegrityError(
-                    f"Non-finite train-only scaling statistics for {channel!r}."
-                )
+                raise GridIntegrityError(f"Non-finite train-only scaling statistics for {channel!r}.")
 
             means[channel] = mean
             scales[channel] = safe_std
@@ -216,9 +211,7 @@ class TrainOnlyStandardizer:
 
     def transform(self, channel: str, values: np.ndarray) -> np.ndarray:
         if channel not in self.means:
-            raise GridIntegrityError(
-                f"Standardizer was not fitted for channel {channel!r}."
-            )
+            raise GridIntegrityError(f"Standardizer was not fitted for channel {channel!r}.")
 
         array = np.asarray(values, dtype=np.float64)
         if array.shape[-1] != self.means[channel].shape[0]:
@@ -261,14 +254,10 @@ def _aggregate_element_to_bus(
                 (bundle.row_count, len(bus_index)),
                 dtype=np.float64,
             )
-        raise GridIntegrityError(
-            f"Element table {element!r} has no 'bus' column."
-        )
+        raise GridIntegrityError(f"Element table {element!r} has no 'bus' column.")
 
     if not frame.columns.equals(table.index):
-        raise GridIntegrityError(
-            f"Absolute profile columns do not align with net.{element}.index."
-        )
+        raise GridIntegrityError(f"Absolute profile columns do not align with net.{element}.index.")
 
     bus_to_position = {bus: pos for pos, bus in enumerate(bus_index)}
     output = np.zeros(
@@ -279,16 +268,11 @@ def _aggregate_element_to_bus(
     for element_index in frame.columns:
         bus = table.at[element_index, "bus"]
         if bus not in bus_to_position:
-            raise GridIntegrityError(
-                f"{element}[{element_index}] refers to unknown bus {bus!r}."
-            )
+            raise GridIntegrityError(f"{element}[{element_index}] refers to unknown bus {bus!r}.")
 
         values = frame[element_index].to_numpy(dtype=np.float64)
         if not np.isfinite(values).all():
-            raise GridIntegrityError(
-                f"Non-finite absolute values in {key!r}, "
-                f"element {element_index!r}."
-            )
+            raise GridIntegrityError(f"Non-finite absolute values in {key!r}, element {element_index!r}.")
         output[:, bus_to_position[bus]] += values
 
     element_total = frame.to_numpy(dtype=np.float64).sum(axis=1)
@@ -299,9 +283,7 @@ def _aggregate_element_to_bus(
         rtol=0.0,
         atol=1e-10,
     ):
-        raise GridIntegrityError(
-            f"Bus aggregation does not conserve total power for {key!r}."
-        )
+        raise GridIntegrityError(f"Bus aggregation does not conserve total power for {key!r}.")
 
     return output
 
@@ -314,12 +296,8 @@ def _series_fingerprint(
 ) -> str:
     hasher = hashlib.sha256()
     hasher.update(grid_code.encode("utf-8"))
-    hasher.update(
-        np.asarray(time_utc.asi8, dtype=np.int64).tobytes(order="C")
-    )
-    hasher.update(
-        "\n".join(str(value) for value in bus_index).encode("utf-8")
-    )
+    hasher.update(np.asarray(time_utc.asi8, dtype=np.int64).tobytes(order="C"))
+    hasher.update("\n".join(str(value) for value in bus_index).encode("utf-8"))
 
     for channel in sorted(values):
         array = np.ascontiguousarray(values[channel])
@@ -338,16 +316,12 @@ def build_canonical_grid_series(grid_code: str) -> CanonicalGridSeries:
 
     time_utc = _parse_profile_time("load", net.profiles["load"])
     if len(time_utc) != bundle.row_count:
-        raise GridIntegrityError(
-            "Profile timeline length does not match absolute-profile row count."
-        )
+        raise GridIntegrityError("Profile timeline length does not match absolute-profile row count.")
 
     if time_utc.tz is None or str(time_utc.tz) != "UTC":
         raise GridIntegrityError("Canonical dataset timeline must be UTC.")
     if time_utc.has_duplicates or not time_utc.is_monotonic_increasing:
-        raise GridIntegrityError(
-            "Canonical dataset timeline must be unique and chronological."
-        )
+        raise GridIntegrityError("Canonical dataset timeline must be unique and chronological.")
 
     bus_index = pd.Index(net.bus.index.copy())
 
@@ -406,9 +380,7 @@ def build_canonical_grid_series(grid_code: str) -> CanonicalGridSeries:
                 f"expected {(bundle.row_count, len(bus_index))}."
             )
         if not np.isfinite(array).all():
-            raise GridIntegrityError(
-                f"Canonical channel {channel!r} contains non-finite values."
-            )
+            raise GridIntegrityError(f"Canonical channel {channel!r} contains non-finite values.")
         values[channel] = array.astype(np.float32)
 
     fingerprint = _series_fingerprint(
@@ -441,14 +413,10 @@ def make_chronological_split(
     if not 0.0 < validation_fraction < 1.0:
         raise GridIntegrityError("validation_fraction must lie in (0, 1).")
     if train_fraction + validation_fraction >= 1.0:
-        raise GridIntegrityError(
-            "train_fraction + validation_fraction must be < 1."
-        )
+        raise GridIntegrityError("train_fraction + validation_fraction must be < 1.")
 
     train_end = int(np.floor(n_steps * train_fraction))
-    validation_end = int(
-        np.floor(n_steps * (train_fraction + validation_fraction))
-    )
+    validation_end = int(np.floor(n_steps * (train_fraction + validation_fraction)))
 
     if train_end <= 0:
         raise GridIntegrityError("Training split would be empty.")
@@ -488,17 +456,13 @@ def build_window_plan(
     spec.validate()
 
     if split.n_steps != n_steps:
-        raise GridIntegrityError(
-            f"Split length {split.n_steps} does not match dataset length {n_steps}."
-        )
+        raise GridIntegrityError(f"Split length {split.n_steps} does not match dataset length {n_steps}.")
 
     first_origin = spec.history_steps - 1
     last_origin = n_steps - spec.lead_steps - spec.horizon_steps
 
     if last_origin < first_origin:
-        raise GridIntegrityError(
-            "Dataset is too short for the requested history/lead/horizon."
-        )
+        raise GridIntegrityError("Dataset is too short for the requested history/lead/horizon.")
 
     windows: list[ForecastWindow] = []
     dropped = 0
@@ -560,9 +524,7 @@ def audit_window_plan(
         == split.n_steps
     )
 
-    targets_by_split: dict[str, set[int]] = {
-        name: set() for name in SPLIT_NAMES
-    }
+    targets_by_split: dict[str, set[int]] = {name: set() for name in SPLIT_NAMES}
     counts = {name: 0 for name in SPLIT_NAMES}
 
     for window in plan.windows:
@@ -578,25 +540,15 @@ def audit_window_plan(
             history_target_order_ok = False
 
         start, end = split.bounds(window.split)
-        if not (
-            start <= window.target_start <= window.target_end < end
-        ):
+        if not (start <= window.target_start <= window.target_end < end):
             target_containment_ok = False
 
-        targets_by_split[window.split].update(
-            range(window.target_start, window.target_end + 1)
-        )
+        targets_by_split[window.split].update(range(window.target_start, window.target_end + 1))
 
     cross_split_target_overlap_ok = (
-        targets_by_split["train"].isdisjoint(
-            targets_by_split["validation"]
-        )
-        and targets_by_split["train"].isdisjoint(
-            targets_by_split["test"]
-        )
-        and targets_by_split["validation"].isdisjoint(
-            targets_by_split["test"]
-        )
+        targets_by_split["train"].isdisjoint(targets_by_split["validation"])
+        and targets_by_split["train"].isdisjoint(targets_by_split["test"])
+        and targets_by_split["validation"].isdisjoint(targets_by_split["test"])
     )
 
     audit = LeakageAudit(
@@ -612,9 +564,7 @@ def audit_window_plan(
     )
 
     if not audit.passed:
-        raise GridIntegrityError(
-            f"Leakage audit failed: {audit.to_dict()}"
-        )
+        raise GridIntegrityError(f"Leakage audit failed: {audit.to_dict()}")
 
     return audit
 
@@ -625,9 +575,7 @@ def known_future_calendar_features(
     local_timezone: str = "Europe/Berlin",
 ) -> pd.DataFrame:
     if time_utc.tz is None:
-        raise GridIntegrityError(
-            "Calendar features require timezone-aware canonical timestamps."
-        )
+        raise GridIntegrityError("Calendar features require timezone-aware canonical timestamps.")
 
     local = time_utc.tz_convert(local_timezone)
 
@@ -640,17 +588,11 @@ def known_future_calendar_features(
     year_angle = 2.0 * np.pi * (day_of_year - 1) / 366.0
 
     utc_offset_hours = np.array(
-        [
-            timestamp.utcoffset().total_seconds() / 3600.0
-            for timestamp in local
-        ],
+        [timestamp.utcoffset().total_seconds() / 3600.0 for timestamp in local],
         dtype=np.float64,
     )
     is_dst = np.array(
-        [
-            float(timestamp.dst().total_seconds() != 0.0)
-            for timestamp in local
-        ],
+        [float(timestamp.dst().total_seconds() != 0.0) for timestamp in local],
         dtype=np.float64,
     )
 
@@ -669,9 +611,7 @@ def known_future_calendar_features(
     )
 
     if not np.isfinite(frame.to_numpy(dtype=float)).all():
-        raise GridIntegrityError(
-            "Known-future calendar features contain non-finite values."
-        )
+        raise GridIntegrityError("Known-future calendar features contain non-finite values.")
 
     return frame
 
@@ -687,34 +627,20 @@ def materialize_window(
     target_names = tuple(target_channels)
 
     if not history_names or not target_names:
-        raise GridIntegrityError(
-            "History and target channel lists must both be non-empty."
-        )
+        raise GridIntegrityError("History and target channel lists must both be non-empty.")
 
     history = np.stack(
-        [
-            series.channel(name)[
-                window.history_start : window.history_end + 1
-            ]
-            for name in history_names
-        ],
+        [series.channel(name)[window.history_start : window.history_end + 1] for name in history_names],
         axis=-1,
     )
 
     target = np.stack(
-        [
-            series.channel(name)[
-                window.target_start : window.target_end + 1
-            ]
-            for name in target_names
-        ],
+        [series.channel(name)[window.target_start : window.target_end + 1] for name in target_names],
         axis=-1,
     )
 
     calendar = known_future_calendar_features(
-        series.time_utc[
-            window.target_start : window.target_end + 1
-        ]
+        series.time_utc[window.target_start : window.target_end + 1]
     ).to_numpy(dtype=np.float32)
 
     return (
