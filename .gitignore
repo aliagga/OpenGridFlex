@@ -13,3 +13,40 @@ data/processed/
 dist/
 build/
 .DS_Store
+
+# Python
+*.pyd
+.ruff_cache/
+.mypy_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key
+
+# Build
+build/
+dist/
+*.egg-info/
+
+# Large local datasets
+data/raw/
+data/downloads/
+
+# Temporary outputs
+tmp/
+temp/
