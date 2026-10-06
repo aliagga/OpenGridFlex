@@ -36,7 +36,7 @@ PYTHONPATH=src pytest -q
 ```
 
 ## Current status
-**M3.2 — global LightGBM deterministic + quantile baseline: GREEN locally.**
+**M3.2 — global LightGBM deterministic + quantile baseline: GREEN locally and in CI.**
 
 Implemented and gated so far:
 - M0: engineering and reproducibility foundation;
@@ -45,4 +45,4 @@ Implemented and gated so far:
 - M3.1: persistence / seasonal-naive sanity baselines;
 - M3.2: global LightGBM point + quantile baseline on the sealed-validation primary task.
 
-The full M3 baseline suite is **not yet complete**: the next model gate is a modern deep temporal baseline. No novel model work starts until the baseline ladder remains reproducible and CI is green.
+The full M3 baseline suite is **not yet complete**. M3.3 develops the pinned PatchTST modern temporal baseline on the same frozen primary task; M4 remains blocked until the baseline ladder is complete and reviewed.
