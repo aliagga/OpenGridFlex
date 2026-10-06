@@ -17,6 +17,8 @@ TRACKED_PACKAGES = (
     "pandas",
     "scikit-learn",
     "lightgbm",
+    "neuralforecast",
+    "pytorch-lightning",
     "torch",
     "torch-geometric",
     "pandapower",
