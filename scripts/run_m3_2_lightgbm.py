@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import shutil
 from importlib.metadata import version
@@ -25,16 +24,14 @@ from opengridflex.evaluation.baseline_runner import (
 from opengridflex.evaluation.lightgbm_runner import (
     evaluate_global_lightgbm,
 )
+from opengridflex.reproducibility import (
+    build_run_manifest,
+    sha256_file,
+    write_run_manifest,
+)
 
+ROOT = Path(__file__).resolve().parents[1]
 GRID_CODE = "1-MV-urban--1-no_sw"
-
-
-def _sha256_file(path: Path) -> str:
-    hasher = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
-            hasher.update(chunk)
-    return hasher.hexdigest()
 
 
 def _json_text(payload: Any) -> str:
@@ -195,14 +192,50 @@ def main() -> int:
                 shutil.rmtree(output)
         output.mkdir(parents=True, exist_ok=True)
 
+        effective_config = {
+            "stage": "M3.2",
+            "grid_code": GRID_CODE,
+            "contract_id": contract.contract_id,
+            "task_id": task.task_id,
+            "test_split_sealed": True,
+            "lightgbm_version": version("lightgbm"),
+            "lightgbm_config": config.to_dict(),
+            "quantiles": list(contract.evaluation.quantiles),
+        }
+        effective_config_path = output / "effective_run_config.json"
+        effective_config_path.write_text(
+            _json_text(effective_config),
+            encoding="utf-8",
+            newline="\n",
+        )
+
+        run_manifest = build_run_manifest(
+            experiment="m3_2_global_lightgbm",
+            seed=config.seed,
+            config_path=effective_config_path,
+            repo_root=ROOT,
+        )
+        run_manifest_path = write_run_manifest(
+            run_manifest,
+            output / "run_manifest.json",
+        )
+
         model_dir = output / "models"
         model_paths = save_global_lightgbm(bundle, model_dir)
         payload["model_files"] = {
             path.relative_to(output).as_posix(): {
-                "sha256": _sha256_file(path),
+                "sha256": sha256_file(path),
                 "size_bytes": path.stat().st_size,
             }
             for path in sorted(model_paths)
+        }
+        payload["effective_run_config"] = {
+            "path": effective_config_path.relative_to(output).as_posix(),
+            "sha256": sha256_file(effective_config_path),
+        }
+        payload["run_manifest"] = {
+            "path": run_manifest_path.relative_to(output).as_posix(),
+            "sha256": sha256_file(run_manifest_path),
         }
 
         manifest = output / "validation_manifest.json"
@@ -212,7 +245,8 @@ def main() -> int:
             newline="\n",
         )
         print(f"Artifact written: {output}")
-        print(f"Manifest SHA-256: {_sha256_file(manifest)}")
+        print(f"Run manifest: {run_manifest_path}")
+        print(f"Validation manifest SHA-256: {sha256_file(manifest)}")
 
     print("\nM3.2 LIGHTGBM BASELINE: PASS")
     return 0
