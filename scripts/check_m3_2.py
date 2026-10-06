@@ -52,7 +52,13 @@ def main() -> int:
         ),
         (
             "M3.2 full primary validation",
-            [sys.executable, "scripts/run_m3_2_lightgbm.py"],
+            [
+                sys.executable,
+                "scripts/run_m3_2_lightgbm.py",
+                "--output-dir",
+                "artifacts/gates/m3_2_lightgbm",
+                "--overwrite",
+            ],
         ),
     ]
 
