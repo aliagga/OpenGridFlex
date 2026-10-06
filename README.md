@@ -36,4 +36,13 @@ PYTHONPATH=src pytest -q
 ```
 
 ## Current status
-**Milestone 0 — engineering and reproducibility foundation.** Grid/data integration is intentionally blocked until this gate is green.
+**M3.2 — global LightGBM deterministic + quantile baseline: GREEN locally.**
+
+Implemented and gated so far:
+- M0: engineering and reproducibility foundation;
+- M1: SimBench adapter and electrical integrity;
+- M2: leak-proof forecasting dataset and benchmark contract;
+- M3.1: persistence / seasonal-naive sanity baselines;
+- M3.2: global LightGBM point + quantile baseline on the sealed-validation primary task.
+
+The full M3 baseline suite is **not yet complete**: the next model gate is a modern deep temporal baseline. No novel model work starts until the baseline ladder remains reproducible and CI is green.

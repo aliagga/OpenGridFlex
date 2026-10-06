@@ -108,13 +108,16 @@ Quantile crossing is REPORTED, not silently repaired. Calibration and monotone
 uncertainty handling belong to later trustworthy-uncertainty milestones.
 
 MODEL ARTIFACTS
-Optional output contains:
+Persisted output contains:
   LightGBM text models
   validation metrics
   feature importance
   model-file SHA-256 hashes
   source dataset fingerprint
-  exact training configuration
+  exact effective run configuration
+  repository-wide run_manifest.json
+  Git commit / dirty state
+  Python, platform and tracked package versions
   LightGBM version
 
 RUN
