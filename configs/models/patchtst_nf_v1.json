@@ -1,0 +1,36 @@
+{
+  "baseline_id": "patchtst_nf_v1",
+  "library": "neuralforecast",
+  "neuralforecast_version": "3.2.2",
+  "task_id": "gsb_bus_pq_4h_v1",
+  "test_split_sealed": true,
+  "feature_policy": {
+    "autoregressive_history": "allowed",
+    "future_calendar": "not_used_by_patchtst_v1",
+    "future_measured_values": "forbidden"
+  },
+  "training": {
+    "seed": 42,
+    "input_size": 96,
+    "horizon_steps": 16,
+    "max_steps": 500,
+    "encoder_layers": 3,
+    "n_heads": 8,
+    "hidden_size": 128,
+    "linear_hidden_size": 256,
+    "dropout": 0.2,
+    "fc_dropout": 0.2,
+    "head_dropout": 0.0,
+    "attn_dropout": 0.0,
+    "patch_len": 16,
+    "stride": 8,
+    "learning_rate": 0.0001,
+    "batch_size": 32,
+    "windows_batch_size": 512,
+    "inference_windows_batch_size": 1024,
+    "scaler_type": "identity",
+    "revin": true,
+    "accelerator": "cpu",
+    "devices": 1
+  }
+}
